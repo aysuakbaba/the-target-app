@@ -6,6 +6,7 @@ import PrimaryButton from "../components/ui/PrimaryButton";
 import Card from "../components/ui/Card";
 import InstructionText from "../components/ui/InstructionText";
 import { Ionicons } from "@expo/vector-icons";
+import GuessLogItem from "../components/game/GuessLogItem";
 
 function generateRandomBetween(min, max, exclude) {
   const rndNum = Math.floor(Math.random() * (max - min)) + min;
@@ -24,7 +25,7 @@ function GameScreen({ userNumber, onGameOver }) {
   const [guessRounds, setGuessRounds] = useState([initialGuess]);
   useEffect(() => {
     if (currentGuess === userNumber) {
-      onGameOver();
+      onGameOver(guessRounds.length);
     }
   }, [currentGuess, userNumber, onGameOver]);
 
@@ -57,6 +58,8 @@ function GameScreen({ userNumber, onGameOver }) {
     setCurrentGuess(newRndNumber);
     setGuessRounds((prevRounds) => [newRndNumber, ...prevRounds]);
   }
+
+  const guessRoundsListLength = guessRounds.length;
   return (
     <View style={styles.screen}>
       <Title>Opponent's Guess</Title>
@@ -79,16 +82,20 @@ function GameScreen({ userNumber, onGameOver }) {
           </View>
         </View>
       </Card>
-      <View>
+      <View style={styles.listContainer}>
         {/* {guessRounds.map(guessRounds => <Text key={guessRounds}>{guessRounds}</Text>)} */}
-        <FlatList data={guessRounds} renderItem={(itemData) => {
-          return(
-            <Text>
-              {itemData.item}
-            </Text>
-          )
-        }}
-        keyExtractor={(item) => item} />
+        <FlatList
+          data={guessRounds}
+          renderItem={(itemData) => {
+            return (
+              <GuessLogItem
+                roundNumber={guessRoundsListLength - itemData.index}
+                guess={itemData.item}
+              />
+            );
+          }}
+          keyExtractor={(item) => item}
+        />
       </View>
     </View>
   );
@@ -111,4 +118,8 @@ const styles = StyleSheet.create({
   buttonContainer: {
     flex: 1,
   },
+  listContainer:{
+    flex: 1,
+    padding: 16
+  }
 });
